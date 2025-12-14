@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diginn Recipe Customizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f8f8f8;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        h1::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 3px;
+            background-color: #d32f2f;
+            margin: 15px auto;
+        }
+
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 25px;
+            background-color: #e8d5d5;
+            color: #333;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background-color: #d5b8b8;
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
+            background-color: #2d2d2d;
+            color: white;
+        }
+
+        .recipe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .recipe-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .recipe-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .recipe-content {
+            padding: 20px;
+        }
+
+        .recipe-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2d2d2d;
+        }
+
+        .recipe-description {
+            font-size: 0.95rem;
+            color: #666;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .recipe-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #999;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .recipe-category {
+            display: inline-block;
+            padding: 4px 12px;
+            background-color: #f0f0f0;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 100%;
+            margin: 40px auto;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            padding: 30px;
+            border-bottom: 2px solid #f0f0f0;
+            position: relative;
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2d2d2d;
+        }
+
+        .modal-subtitle {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            width: 35px;
+            height: 35px;
+            border: none;
+            background: #f0f0f0;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: #e0e0e0;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .quantity-control {
+            background: #f8f8f8;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .quantity-control label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            color: #2d2d2d;
+        }
+
+        .quantity-input {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .qty-btn {
+            width: 45px;
+            height: 45px;
+            border: none;
+            background: #2d2d2d;
+            color: white;
+            font-size: 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .qty-btn:hover {
+            background: #444;
+            transform: scale(1.1);
+        }
+
+        .qty-display {
+            font-size: 2rem;
+            font-weight: 600;
+            min-width: 150px;
+            color: #2d2d2d;
+        }
+
+        .ingredients-section, .instructions-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2d2d2d;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #d32f2f;
+        }
+
+        .ingredient-list {
+            list-style: none;
+        }
+
+        .ingredient-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 1rem;
+        }
+
+        .ingredient-item:last-child {
+            border-bottom: none;
+        }
+
+        .ingredient-name {
+            color: #2d2d2d;
+            font-weight: 500;
+        }
+
+        .ingredient-amount {
+            color: #666;
+            font-weight: 600;
+        }
+
+        .instructions-list {
+            counter-reset: step-counter;
+            list-style: none;
+        }
+
+        .instruction-step {
+            counter-increment: step-counter;
+            padding: 15px 0 15px 50px;
+            position: relative;
+            line-height: 1.7;
+            font-size: 1rem;
+            color: #444;
+        }
+
+        .instruction-step::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 15px;
+            width: 35px;
+            height: 35px;
+            background: #2d2d2d;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .marinade-note {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ff9800;
+        }
+
+        .marinade-note strong {
+            color: #e65100;
+        }
+
+        @media (max-width: 768px) {
+            .recipe-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .modal-content {
+                margin: 20px auto;
+            }
+
+            .qty-display {
+                font-size: 1.5rem;
+                min-width: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Recipe Customizer</h1>
+        </header>
+
+        <div class="filters">
+            <button class="filter-btn active" data-category="all">All</button>
+            <button class="filter-btn" data-category="proteins">Proteins</button>
+            <button class="filter-btn" data-category="vegetables">Vegetables</button>
+            <button class="filter-btn" data-category="bases">Bases</button>
+            <button class="filter-btn" data-category="sauces">Sauces</button>
+        </div>
+
+        <div class="recipe-grid" id="recipeGrid"></div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="recipeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle"></h2>
+                <p class="modal-subtitle" id="modalSubtitle"></p>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="quantity-control">
+                    <label>Adjust Servings</label>
+                    <div class="quantity-input">
+                        <button class="qty-btn" onclick="decreaseQuantity()">−</button>
+                        <div class="qty-display" id="qtyDisplay"></div>
+                        <button class="qty-btn" onclick="increaseQuantity()">+</button>
+                    </div>
+                </div>
+
+                <div id="marinadeNote"></div>
+
+                <div class="ingredients-section">
+                    <h3 class="section-title">Ingredients</h3>
+                    <ul class="ingredient-list" id="ingredientList"></ul>
+                </div>
+
+                <div class="instructions-section">
+                    <h3 class="section-title">Instructions</h3>
+                    <ol class="instructions-list" id="instructionsList"></ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const recipes = [
+            {
+                id: 1,
+                name: "Charred Chicken Thighs",
+                category: "proteins",
+                description: "Perfectly seared boneless chicken thighs with a crispy exterior and juicy interior, finished in the oven",
+                baseServings: 4,
+                ingredients: [
+                    { name: "boneless, skinless chicken thighs", amount: 2, unit: "lb", scalable: true },
+                    { name: "olive oil", amount: 1, unit: "tbsp", scalable: true },
+                    { name: "kosher salt", amount: 1, unit: "tsp", scalable: true },
+                    { name: "black pepper", amount: 0.5, unit: "tsp", scalable: true },
+                    { name: "garlic powder", amount: 1, unit: "tsp", scalable: true }
+                ],
+                instructions: [
+                    "Pat chicken thighs dry with paper towels",
+                    "Toss with oil, salt, pepper, and garlic powder until evenly coated",
+                    "Heat cast-iron skillet over high heat until very hot",
+                    "Sear chicken 3-4 minutes per side until deep golden brown",
+                    "Transfer skillet to preheated 400°F oven",
+                    "Cook 6-8 minutes until internal temperature reaches 165°F",
+                    "Rest 5 minutes before slicing"
+                ],
+                marinadeTime: null
+            },
+            {
+                id: 2,
+                name: "Honey Sriracha Glazed Chicken Thighs",
+                category: "proteins",
+                description: "Sweet and spicy glazed chicken with caramelized edges and bold Asian-inspired flavors",
+                baseServings: 4,
+                ingredients: [
+                    { name: "boneless, skinless chicken thighs", amount: 2, unit: "lb", scalable: true },
+                    { name: "honey", amount: 6, unit: "tbsp", scalable: true },
+                    { name: "sriracha", amount: 3, unit: "tbsp", scalable: true },
+                    { name: "soy sauce", amount: 1, unit: "tbsp", scalable: true },
+                    { name: "rice or apple cider vinegar", amount: 1, unit: "tbsp", scalable: true },
+                    { name: "minced garlic", amount: 1, unit: "tsp", scalable: true },
+                    { name: "smoked paprika", amount: 0.5, unit: "tsp", scalable: true },
+                    { name: "salt", amount: 0.25, unit: "tsp", scalable: true }
+                ],
+                instructions: [
+                    "Whisk together honey, sriracha, soy sauce, vinegar, garlic, paprika, and salt",
+                    "Reserve half of the sauce for glazing at the end",
+                    "Marinate chicken thighs in remaining sauce for 30-240 minutes",
+                    "Heat skillet over medium-high heat",
+                    "Sear marinated chicken 3 minutes per side",
+                    "Brush with reserved sauce",
+                    "Transfer to 400°F oven and cook 6-8 minutes until 165°F internal",
+                    "Optional: broil 1 minute to caramelize glaze",
+                    "Rest 5 minutes before serving"
+                ],
+                marinadeTime: "30-240 minutes"
+            },
+            {
+                id: 3,
+                name: "Citrus-Soy Beef",
+                category: "proteins",
+                description: "Quick-roasted flank or sirloin with bright citrus and savory soy marinade, sliced thin for maximum tenderness",
+                baseServings: 4,
+                ingredients: [
+                    { name: "flank or sirloin steak", amount: 1.5, unit: "lb", scalable: true },
+                    { name: "kosher salt", amount: 0.75, unit: "tsp", scalable: true },
+                    { name: "black pepper", amount: 0.5, unit: "tsp", scalable: true },
+                    { name: "honey", amount: 1, unit: "tbsp", scalable: true },
+                    { name: "soy sauce", amount: 1, unit: "tbsp", scalable: true },
+                    { name: "lime juice", amount: 1, unit: "tsp", scalable: true },
+                    { name: "sesame oil", amount: 1, unit: "tsp", scalable: true },
+                    { name: "garlic clove, minced", amount: 1, unit: "clove", scalable: true }
+                ],
+                instructions: [
+                    "Whisk together honey, soy sauce, lime juice, sesame oil, and garlic",
+                    "Season beef with salt and pepper, then add to marinade",
+                    "Marinate 30-120 minutes in refrigerator",
+                    "Heat oven to 425°F",
+                    "Heat oven-safe skillet over high heat",
+                    "Sear beef 2 minutes per side until deep brown crust forms",
+                    "Transfer to oven and roast 6-8 minutes for medium-rare",
+                    "Remove and rest 10 minutes",
+                    "Slice thin against the grain before serving"
+                ],
+                marinadeTime: "30-120 minutes"
+            },
+            {
+                id: 4,
+                name: "Charred Broccoli with Lemon",
+                category: "vegetables",
+                description: "Perfectly roasted broccoli with crispy charred edges, brightened with lemon and soy",
+                baseServings: 4,
+                ingredients: [
+                    { name: "broccoli florets", amount: 1.5, unit: "lb", scalable: true },
+                    { name: "olive oil", amount: 2, unit: "tbsp", scalable: true },
+                    { name: "kosher salt", amount: 0.75, unit: "tsp", scalable: true },
+                    { name: "lemon juice", amount: 1, unit: "tbsp", scalable: true },
+                    { name: "soy sauce", amount: 1, unit: "tsp", scalable: true },
+                    { name: "chili flakes", amount: 0.125, unit: "tsp", scalable: true }
+                ],
+                instructions: [
+                    "Preheat oven to 425°F",
+                    "Toss broccoli florets with olive oil and salt",
+                    "Spread on baking sheet in single layer",
+                    "Roast 16-18 minutes until edges are charred",
+                    "Transfer hot broccoli to serving bowl",
+                    "Toss with lemon juice, soy sauce, and chili flakes",
+                    "Optional: tent with foil for 10 minutes to steam stalks tender"
+                ],
+                marinadeTime: null
+            },
+            {
+                id: 5,
+                name: "Roasted Sweet Potatoes",
+                category: "vegetables",
+                description: "Caramelized sweet potato cubes with smoky paprika and warm cumin, perfect as a side or bowl base",
+                baseServings: 4,
+                ingredients: [
+                    { name: "sweet potatoes, 1-inch cubes", amount: 2, unit: "lb", scalable: true },
+                    { name: "olive oil", amount: 2, unit: "tbsp", scalable: true },
+                    { name: "kosher salt", amount: 0.75, unit: "tsp", scalable: true },
+                    { name: "smoked paprika", amount: 0.5, unit: "tsp", scalable: true },
+                    { name: "ground cumin", amount: 0.25, unit: "tsp", scalable: true },
+                    { name: "honey (optional)", amount: 1, unit: "tsp", scalable: true }
+                ],
+                instructions: [
+                    "Preheat oven to 400-425°F",
+                    "Cut sweet potatoes into 1-inch cubes",
+                    "Toss with oil, salt, paprika, cumin, and honey if using",
+                    "Spread in single layer on baking sheet",
+                    "Roast 25-35 minutes, flipping once halfway through",
+                    "Continue until browned and tender when pierced",
+                    "Serve immediately"
+                ],
+                marinadeTime: null
+            },
+            {
+                id: 6,
+                name: "Sheet-Tray Carrots",
+                category: "vegetables",
+                description: "Honey-glazed roasted carrots with warm spices and a hint of vinegar for balance",
+                baseServings: 4,
+                ingredients: [
+                    { name: "carrots, ½-inch coins or batons", amount: 1.5, unit: "lb", scalable: true },
+                    { name: "olive oil", amount: 1.5, unit: "tbsp", scalable: true },
+                    { name: "honey", amount: 0.5, unit: "tsp", scalable: true },
+                    { name: "ground coriander", amount: 0.5, unit: "tsp", scalable: true },
+                    { name: "ground cumin", amount: 0.25, unit: "tsp", scalable: true },
+                    { name: "kosher salt", amount: 0.5, unit: "tsp", scalable: true },
+                    { name: "cider vinegar", amount: 1, unit: "tsp", scalable: true }
+                ],
+                instructions: [
+                    "Preheat oven to 425°F",
+                    "Cut carrots into ½-inch coins or batons",
+                    "Toss with oil, honey, coriander, cumin, and salt",
+                    "Spread on sheet tray in single layer",
+                    "Roast 18-22 minutes until lightly charred and tender",
+                    "Drizzle with cider vinegar",
+                    "Toss to coat and serve"
+                ],
+                marinadeTime: null
+            },
+            {
+                id: 7,
+                name: "Cashew Kale Caesar",
+                category: "vegetables",
+                description: "Massaged kale salad with creamy cashew-based caesar dressing and crunchy breadcrumbs",
+                baseServings: 4,
+                ingredients: [
+                    { name: "curly kale, chopped", amount: 10, unit: "oz", scalable: true },
+                    { name: "cashew butter", amount: 3, unit: "tbsp", scalable: true },
+                    { name: "lemon juice", amount: 2, unit: "tbsp", scalable: true },
+                    { name: "honey", amount: 1, unit: "tbsp", scalable: true },
+                    { name: "olive oil", amount: 1, unit: "tbsp", scalable: true },
+                    { name: "garlic clove, grated", amount: 1, unit: "clove", scalable: true },
+                    { name: "Dijon mustard", amount: 0.5, unit: "tsp", scalable: true },
+                    { name: "salt", amount: 0.375, unit: "tsp", scalable: true },
+                    { name: "water to thin", amount: 2.5, unit: "tbsp", scalable: true },
+                    { name: "coarse breadcrumbs", amount: 0.5, unit: "cup", scalable: true }
+                ],
+                instructions: [
+                    "Remove kale stems and chop leaves into bite-size pieces",
+                    "Massage kale with 1 tsp olive oil and a pinch of salt for 1 minute",
+                    "Whisk together cashew butter, lemon juice, honey, olive oil, garlic, Dijon, and salt",
+                    "Add water 1 tbsp at a time until dressing reaches pourable consistency",
+                    "Toss massaged kale with dressing to taste",
+                    "Add breadcrumbs just before serving for crunch"
+                ],
+                marinadeTime: null
+            },
+            {
+                id: 8,
+                name: "Brown Rice",
+                category: "bases",
+                description: "Fluffy long-grain brown rice, perfectly cooked with a hint of salt and olive oil",
+                baseServings: 4,
+                ingredients: [
+                    { name: "brown rice", amount: 1, unit: "cup", scalable: true },
+                    { name: "water", amount: 2, unit: "cups", scalable: true },
+                    { name: "salt", amount: 0.5, unit: "tsp", scalable: true },
+                    { name: "olive oil", amount: 1, unit: "tsp", scalable: true }
+                ],
+                instructions: [
+                    "Rinse brown rice under cold water",
+                    "Combine rice, water, salt, and olive oil in pot",
+                    "Bring to a rolling boil over high heat",
+                    "Cover pot and reduce heat to low",
+                    "Simmer 45 minutes until water is absorbed",
+                    "Remove from heat and rest covered 10 minutes",
+                    "Fluff with fork before serving"
+                ],
+                marinadeTime: null
+            },
+            {
+                id: 9,
+                name: "Farro",
+                category: "bases",
+                description: "Chewy pearled farro with nutty flavor, ideal for grain bowls and salads",
+                baseServings: 4,
+                ingredients: [
+                    { name: "pearled farro", amount: 1, unit: "cup", scalable: true },
+                    { name: "water or stock", amount: 3, unit: "cups", scalable: true },
+                    { name: "salt", amount: 0.75, unit: "tsp", scalable: true },
+                    { name: "olive oil", amount: 1, unit: "tbsp", scalable: true }
+                ],
+                instructions: [
+                    "Bring water or stock to a boil in medium pot",
+                    "Add farro and salt",
+                    "Reduce heat to maintain gentle simmer",
+                    "Cook uncovered 25-30 minutes until tender but chewy",
+                    "Drain any remaining liquid",
+                    "Drizzle with olive oil and toss",
+                    "Serve warm or at room temperature"
+                ],
+                marinadeTime: null
+            },
+            {
+                id: 10,
+                name: "Honey Sriracha Glaze",
+                category: "sauces",
+                description: "Sweet, spicy, and sticky glaze perfect for chicken, vegetables, or bowls",
+                baseServings: 4,
+                ingredients: [
+                    { name: "honey", amount: 6, unit: "tbsp", scalable: true },
+                    { name: "sriracha", amount: 3, unit: "tbsp", scalable: true },
+                    { name: "rice vinegar", amount: 1, unit: "tbsp", scalable: true },
+                    { name: "soy sauce", amount: 1, unit: "tbsp", scalable: true },
+                    { name: "minced garlic", amount: 1, unit: "clove", scalable: true },
+                    { name: "salt", amount: 0.125, unit: "tsp", scalable: true }
+                ],
+                instructions: [
+                    "Whisk all ingredients in a small bowl until smooth",
+                    "Transfer to small saucepan",
+                    "Warm gently over low heat 3-5 minutes until glossy",
+                    "Stir occasionally to prevent scorching",
+                    "Cool 5 minutes before using",
+                    "Store refrigerated up to 1 week"
+                ],
+                marinadeTime: null
+            },
+            {
+                id: 11,
+                name: "Miso Soy Glaze",
+                category: "sauces",
+                description: "Rich umami sauce with fermented miso and sesame, no cooking required",
+                baseServings: 4,
+                ingredients: [
+                    { name: "white miso paste", amount: 3, unit: "tbsp", scalable: true },
+                    { name: "soy sauce", amount: 2, unit: "tbsp", scalable: true },
+                    { name: "rice vinegar or lime juice", amount: 2, unit: "tbsp", scalable: true },
+                    { name: "honey", amount: 2, unit: "tbsp", scalable: true },
+                    { name: "sesame oil", amount: 2, unit: "tbsp", scalable: true },
+                    { name: "sriracha (optional)", amount: 1, unit: "tbsp", scalable: true }
+                ],
+                instructions: [
+                    "Combine all ingredients in a bowl",
+                    "Whisk vigorously until smooth and fully combined",
+                    "No heat needed - ready to use immediately",
+                    "Use on tofu, chicken, salmon, or roasted vegetables",
+                    "Store refrigerated up to 1 week",
+                    "Stir before each use"
+                ],
+                marinadeTime: null
+            },
+            {
+                id: 12,
+                name: "Creamy Cashew Caesar",
+                category: "sauces",
+                description: "Vegan caesar dressing made with blended cashews, bright lemon, and Dijon",
+                baseServings: 4,
+                ingredients: [
+                    { name: "raw cashews", amount: 0.5, unit: "cup", scalable: true },
+                    { name: "lemon juice", amount: 0.25, unit: "cup", scalable: true },
+                    { name: "Dijon mustard", amount: 2, unit: "tsp", scalable: true },
+                    { name: "garlic clove", amount: 1, unit: "clove", scalable: true },
+                    { name: "salt", amount: 0.5, unit: "tsp", scalable: true },
+                    { name: "water", amount: 5, unit: "tbsp", scalable: true }
+                ],
+                instructions: [
+                    "Soak cashews in hot water 15-60 minutes (or boil 10 minutes)",
+                    "Drain cashews completely",
+                    "Add cashews, lemon juice, Dijon, garlic, and salt to blender",
+                    "Blend on high until completely smooth",
+                    "Add water 1 tbsp at a time until desired consistency",
+                    "Refrigerate up to 5 days; stir before use"
+                ],
+                marinadeTime: null
+            },
+            {
+                id: 13,
+                name: "Lemon Tahini Dressing",
+                category: "sauces",
+                description: "Bright and creamy Middle Eastern-inspired sauce for roasted vegetables and grains",
+                baseServings: 4,
+                ingredients: [
+                    { name: "tahini", amount: 3, unit: "tbsp", scalable: true },
+                    { name: "lemon juice", amount: 2, unit: "tbsp", scalable: true },
+                    { name: "honey", amount: 1, unit: "tbsp", scalable: true },
+                    { name: "olive oil", amount: 1, unit: "tbsp", scalable: true },
+                    { name: "garlic clove, minced", amount: 1, unit: "clove", scalable: true },
+                    { name: "water", amount: 2.5, unit: "tbsp", scalable: true }
+                ],
+                instructions: [
+                    "Whisk tahini and lemon juice together (it will seize at first)",
+                    "Add honey, olive oil, and minced garlic",
+                    "Whisk until smooth",
+                    "Add water 1 tbsp at a time until creamy and pourable",
+                    "Drizzle over roasted vegetables or grain bowls",
+                    "Store refrigerated up to 5 days"
+                ],
+                marinadeTime: null
+            },
+            {
+                id: 14,
+                name: "Simple Soy Vinaigrette",
+                category: "sauces",
+                description: "Quick Asian-style dressing with soy, sesame, and ginger for warm bowls",
+                baseServings: 4,
+                ingredients: [
+                    { name: "soy sauce", amount: 3, unit: "tbsp", scalable: true },
+                    { name: "rice vinegar", amount: 2, unit: "tbsp", scalable: true },
+                    { name: "honey", amount: 1, unit: "tbsp", scalable: true },
+                    { name: "sesame oil", amount: 1, unit: "tsp", scalable: true },
+                    { name: "fresh ginger, grated", amount: 0.5, unit: "tsp", scalable: true }
+                ],
+                instructions: [
+                    "Combine all ingredients in a jar with tight lid",
+                    "Shake vigorously until emulsified",
+                    "Alternatively, whisk together in a bowl",
+                    "Drizzle over warm bowls to add acid and umami",
+                    "Store refrigerated up to 1 week",
+                    "Shake before each use"
+                ],
+                marinadeTime: null
+            }
+        ];
+
+        let currentRecipe = null;
+        let currentServings = 4;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderRecipes('all');
+            setupFilters();
+        });
+
+        function setupFilters() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const category = btn.dataset.category;
+                    renderRecipes(category);
+                });
+            });
+        }
+
+        function renderRecipes(category) {
+            const grid = document.getElementById('recipeGrid');
+            const filteredRecipes = category === 'all'
+                ? recipes
+                : recipes.filter(r => r.category === category);
+
+            grid.innerHTML = filteredRecipes.map(recipe => `
+                <div class="recipe-card" onclick="openRecipe(${recipe.id})">
+                    <div class="recipe-image"></div>
+                    <div class="recipe-content">
+                        <h3 class="recipe-title">${recipe.name}</h3>
+                        <p class="recipe-description">${recipe.description}</p>
+                        <div class="recipe-meta">
+                            <span class="recipe-category">${recipe.category}</span>
+                            <span>${recipe.baseServings} servings</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openRecipe(recipeId) {
+            currentRecipe = recipes.find(r => r.id === recipeId);
+            currentServings = currentRecipe.baseServings;
+
+            document.getElementById('modalTitle').textContent = currentRecipe.name;
+            document.getElementById('modalSubtitle').textContent = currentRecipe.description;
+
+            updateRecipeDisplay();
+            document.getElementById('recipeModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('recipeModal').classList.remove('active');
+        }
+
+        function increaseQuantity() {
+            currentServings++;
+            updateRecipeDisplay();
+        }
+
+        function decreaseQuantity() {
+            if (currentServings > 1) {
+                currentServings--;
+                updateRecipeDisplay();
+            }
+        }
+
+        function updateRecipeDisplay() {
+            const scaleFactor = currentServings / currentRecipe.baseServings;
+
+            // Update servings display
+            document.getElementById('qtyDisplay').textContent = `${currentServings} servings`;
+
+            // Show marinade note if applicable
+            const marinadeNote = document.getElementById('marinadeNote');
+            if (currentRecipe.marinadeTime) {
+                marinadeNote.innerHTML = `
+                    <div class="marinade-note">
+                        <strong>Marinade Time:</strong> ${currentRecipe.marinadeTime}
+                    </div>
+                `;
+            } else {
+                marinadeNote.innerHTML = '';
+            }
+
+            // Update ingredients
+            const ingredientList = document.getElementById('ingredientList');
+            ingredientList.innerHTML = currentRecipe.ingredients.map(ing => {
+                const scaledAmount = ing.scalable ? (ing.amount * scaleFactor) : ing.amount;
+                const formattedAmount = formatAmount(scaledAmount);
+
+                return `
+                    <li class="ingredient-item">
+                        <span class="ingredient-name">${ing.name}</span>
+                        <span class="ingredient-amount">${formattedAmount} ${ing.unit}</span>
+                    </li>
+                `;
+            }).join('');
+
+            // Update instructions
+            const instructionsList = document.getElementById('instructionsList');
+            instructionsList.innerHTML = currentRecipe.instructions.map(step => `
+                <li class="instruction-step">${step}</li>
+            `).join('');
+        }
+
+        function formatAmount(amount) {
+            // Handle common fractions
+            const fraction = amount - Math.floor(amount);
+            const whole = Math.floor(amount);
+
+            const fractions = {
+                0.125: '⅛',
+                0.25: '¼',
+                0.333: '⅓',
+                0.375: '⅜',
+                0.5: '½',
+                0.625: '⅝',
+                0.666: '⅔',
+                0.75: '¾',
+                0.875: '⅞'
+            };
+
+            // Find closest fraction
+            let closestFraction = null;
+            let minDiff = 0.05;
+
+            for (let [dec, frac] of Object.entries(fractions)) {
+                const diff = Math.abs(fraction - parseFloat(dec));
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    closestFraction = frac;
+                }
+            }
+
+            if (closestFraction && minDiff < 0.03) {
+                return whole > 0 ? `${whole} ${closestFraction}` : closestFraction;
+            }
+
+            // Round to 2 decimal places for non-fractional amounts
+            return amount % 1 === 0 ? amount.toString() : amount.toFixed(2);
+        }
+
+        // Close modal on outside click
+        document.getElementById('recipeModal').addEventListener('click', (e) => {
+            if (e.target.id === 'recipeModal') {
+                closeModal();
+            }
+        });
+
+        // Close modal on ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
