@@ -100,8 +100,11 @@
         .recipe-image {
             width: 100%;
             height: 250px;
-            object-fit: cover;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .recipe-content {
@@ -423,6 +426,7 @@
                 name: "Charred Chicken Thighs",
                 category: "proteins",
                 description: "Perfectly seared boneless chicken thighs with a crispy exterior and juicy interior, finished in the oven",
+                imageKeywords: "grilled-chicken-thighs",
                 baseServings: 4,
                 ingredients: [
                     { name: "boneless, skinless chicken thighs", amount: 2, unit: "lb", scalable: true },
@@ -447,6 +451,7 @@
                 name: "Honey Sriracha Glazed Chicken Thighs",
                 category: "proteins",
                 description: "Sweet and spicy glazed chicken with caramelized edges and bold Asian-inspired flavors",
+                imageKeywords: "asian-glazed-chicken",
                 baseServings: 4,
                 ingredients: [
                     { name: "boneless, skinless chicken thighs", amount: 2, unit: "lb", scalable: true },
@@ -476,6 +481,7 @@
                 name: "Citrus-Soy Beef",
                 category: "proteins",
                 description: "Quick-roasted flank or sirloin with bright citrus and savory soy marinade, sliced thin for maximum tenderness",
+                imageKeywords: "sliced-steak-beef",
                 baseServings: 4,
                 ingredients: [
                     { name: "flank or sirloin steak", amount: 1.5, unit: "lb", scalable: true },
@@ -505,6 +511,7 @@
                 name: "Charred Broccoli with Lemon",
                 category: "vegetables",
                 description: "Perfectly roasted broccoli with crispy charred edges, brightened with lemon and soy",
+                imageKeywords: "roasted-broccoli",
                 baseServings: 4,
                 ingredients: [
                     { name: "broccoli florets", amount: 1.5, unit: "lb", scalable: true },
@@ -530,6 +537,7 @@
                 name: "Roasted Sweet Potatoes",
                 category: "vegetables",
                 description: "Caramelized sweet potato cubes with smoky paprika and warm cumin, perfect as a side or bowl base",
+                imageKeywords: "roasted-sweet-potato-cubes",
                 baseServings: 4,
                 ingredients: [
                     { name: "sweet potatoes, 1-inch cubes", amount: 2, unit: "lb", scalable: true },
@@ -555,6 +563,7 @@
                 name: "Sheet-Tray Carrots",
                 category: "vegetables",
                 description: "Honey-glazed roasted carrots with warm spices and a hint of vinegar for balance",
+                imageKeywords: "roasted-carrots",
                 baseServings: 4,
                 ingredients: [
                     { name: "carrots, ½-inch coins or batons", amount: 1.5, unit: "lb", scalable: true },
@@ -581,6 +590,7 @@
                 name: "Cashew Kale Caesar",
                 category: "vegetables",
                 description: "Massaged kale salad with creamy cashew-based caesar dressing and crunchy breadcrumbs",
+                imageKeywords: "kale-caesar-salad",
                 baseServings: 4,
                 ingredients: [
                     { name: "curly kale, chopped", amount: 10, unit: "oz", scalable: true },
@@ -609,6 +619,7 @@
                 name: "Brown Rice",
                 category: "bases",
                 description: "Fluffy long-grain brown rice, perfectly cooked with a hint of salt and olive oil",
+                imageKeywords: "brown-rice-bowl",
                 baseServings: 4,
                 ingredients: [
                     { name: "brown rice", amount: 1, unit: "cup", scalable: true },
@@ -632,6 +643,7 @@
                 name: "Farro",
                 category: "bases",
                 description: "Chewy pearled farro with nutty flavor, ideal for grain bowls and salads",
+                imageKeywords: "farro-grain",
                 baseServings: 4,
                 ingredients: [
                     { name: "pearled farro", amount: 1, unit: "cup", scalable: true },
@@ -655,6 +667,7 @@
                 name: "Honey Sriracha Glaze",
                 category: "sauces",
                 description: "Sweet, spicy, and sticky glaze perfect for chicken, vegetables, or bowls",
+                imageKeywords: "hot-sauce-sriracha",
                 baseServings: 4,
                 ingredients: [
                     { name: "honey", amount: 6, unit: "tbsp", scalable: true },
@@ -679,6 +692,7 @@
                 name: "Miso Soy Glaze",
                 category: "sauces",
                 description: "Rich umami sauce with fermented miso and sesame, no cooking required",
+                imageKeywords: "miso-paste-sauce",
                 baseServings: 4,
                 ingredients: [
                     { name: "white miso paste", amount: 3, unit: "tbsp", scalable: true },
@@ -703,6 +717,7 @@
                 name: "Creamy Cashew Caesar",
                 category: "sauces",
                 description: "Vegan caesar dressing made with blended cashews, bright lemon, and Dijon",
+                imageKeywords: "creamy-salad-dressing",
                 baseServings: 4,
                 ingredients: [
                     { name: "raw cashews", amount: 0.5, unit: "cup", scalable: true },
@@ -727,6 +742,7 @@
                 name: "Lemon Tahini Dressing",
                 category: "sauces",
                 description: "Bright and creamy Middle Eastern-inspired sauce for roasted vegetables and grains",
+                imageKeywords: "tahini-sauce-lemon",
                 baseServings: 4,
                 ingredients: [
                     { name: "tahini", amount: 3, unit: "tbsp", scalable: true },
@@ -751,6 +767,7 @@
                 name: "Simple Soy Vinaigrette",
                 category: "sauces",
                 description: "Quick Asian-style dressing with soy, sesame, and ginger for warm bowls",
+                imageKeywords: "soy-sauce-asian",
                 baseServings: 4,
                 ingredients: [
                     { name: "soy sauce", amount: 3, unit: "tbsp", scalable: true },
@@ -800,7 +817,12 @@
 
             grid.innerHTML = filteredRecipes.map(recipe => `
                 <div class="recipe-card" onclick="openRecipe(${recipe.id})">
-                    <div class="recipe-image"></div>
+                    <div class="recipe-image">
+                        <img src="https://source.unsplash.com/400x300/?${recipe.imageKeywords},food"
+                             alt="${recipe.name}"
+                             loading="lazy"
+                             style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
                     <div class="recipe-content">
                         <h3 class="recipe-title">${recipe.name}</h3>
                         <p class="recipe-description">${recipe.description}</p>
