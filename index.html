@@ -1270,8 +1270,7 @@
                         aggregated[key] = {
                             name: ing.name,
                             amount: scaledAmount,
-                            unit: ing.unit,
-                            category: recipe.category
+                            unit: ing.unit
                         };
                     }
                 });
@@ -1316,6 +1315,44 @@
             return pantryItems.some(item => normalized.includes(item));
         }
 
+        function getIngredientCategory(ingredientName) {
+            const name = ingredientName.toLowerCase();
+
+            // Proteins
+            if (name.includes('chicken') || name.includes('beef') || name.includes('steak') ||
+                name.includes('flank') || name.includes('sirloin') || name.includes('thigh')) {
+                return 'Proteins';
+            }
+
+            // Produce
+            if (name.includes('broccoli') || name.includes('carrot') || name.includes('sweet potato') ||
+                name.includes('kale') || name.includes('garlic') || name.includes('ginger') ||
+                name.includes('lemon') || name.includes('lime')) {
+                return 'Produce';
+            }
+
+            // Grains & Pantry
+            if (name.includes('rice') || name.includes('farro') || name.includes('cashew') ||
+                name.includes('breadcrumb')) {
+                return 'Grains & Pantry';
+            }
+
+            // Condiments & Sauces
+            if (name.includes('honey') || name.includes('sriracha') || name.includes('soy sauce') ||
+                name.includes('vinegar') || name.includes('miso') || name.includes('mustard') ||
+                name.includes('tahini')) {
+                return 'Condiments & Sauces';
+            }
+
+            // Oils & Seasonings
+            if (name.includes('oil') || name.includes('paprika') || name.includes('cumin') ||
+                name.includes('coriander') || name.includes('sesame')) {
+                return 'Oils & Seasonings';
+            }
+
+            return 'Other';
+        }
+
         function displayShoppingList(aggregated) {
             const content = document.getElementById('shoppingListContent');
             const items = Object.values(aggregated);
@@ -1325,34 +1362,32 @@
                 return;
             }
 
-            // Group by category
-            const byCategory = {
-                proteins: [],
-                vegetables: [],
-                bases: [],
-                sauces: [],
-                other: []
+            // Group by ingredient type
+            const byType = {
+                'Proteins': [],
+                'Produce': [],
+                'Grains & Pantry': [],
+                'Condiments & Sauces': [],
+                'Oils & Seasonings': [],
+                'Other': []
             };
 
             items.forEach(item => {
-                const cat = item.category || 'other';
-                if (byCategory[cat]) {
-                    byCategory[cat].push(item);
-                } else {
-                    byCategory.other.push(item);
-                }
+                const type = getIngredientCategory(item.name);
+                byType[type].push(item);
             });
 
             let html = '<div class="shopping-list">';
 
-            Object.keys(byCategory).forEach(category => {
-                if (byCategory[category].length > 0) {
+            // Display categories in order
+            ['Proteins', 'Produce', 'Grains & Pantry', 'Condiments & Sauces', 'Oils & Seasonings', 'Other'].forEach(type => {
+                if (byType[type].length > 0) {
                     html += `
                         <div class="shopping-category">
-                            <h3 class="shopping-category-title">${category.charAt(0).toUpperCase() + category.slice(1)}</h3>
+                            <h3 class="shopping-category-title">${type}</h3>
                     `;
 
-                    byCategory[category].forEach(item => {
+                    byType[type].forEach(item => {
                         const formattedAmount = formatAmount(item.amount);
                         html += `
                             <div class="shopping-item">
