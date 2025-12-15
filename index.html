@@ -46,6 +46,44 @@
             margin: 15px auto;
         }
 
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .nav-tab {
+            padding: 15px 40px;
+            border: none;
+            background: transparent;
+            color: #666;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            margin-bottom: -2px;
+        }
+
+        .nav-tab:hover {
+            color: #2d2d2d;
+        }
+
+        .nav-tab.active {
+            color: #d32f2f;
+            border-bottom-color: #d32f2f;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
         .filters {
             display: flex;
             justify-content: center;
@@ -348,6 +386,149 @@
             color: #e65100;
         }
 
+        /* Meal Planning Styles */
+        .meal-plan-list {
+            max-width: 900px;
+            margin: 0 auto 40px;
+        }
+
+        .meal-item {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .meal-info {
+            flex: 1;
+        }
+
+        .meal-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d2d2d;
+            margin-bottom: 5px;
+        }
+
+        .meal-category {
+            font-size: 0.9rem;
+            color: #999;
+            text-transform: capitalize;
+        }
+
+        .meal-selector {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .meal-selector label {
+            font-weight: 500;
+            color: #666;
+            white-space: nowrap;
+        }
+
+        .meal-selector input {
+            width: 80px;
+            padding: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+
+        .meal-selector input:focus {
+            outline: none;
+            border-color: #d32f2f;
+        }
+
+        .shopping-list-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .shopping-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .shopping-list-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #2d2d2d;
+        }
+
+        .copy-btn {
+            padding: 10px 20px;
+            background: #d32f2f;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #b71c1c;
+        }
+
+        .copy-btn.copied {
+            background: #4caf50;
+        }
+
+        .shopping-list {
+            list-style: none;
+        }
+
+        .shopping-category {
+            margin-bottom: 20px;
+        }
+
+        .shopping-category-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d2d2d;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .shopping-item {
+            padding: 8px 0;
+            color: #444;
+            font-size: 1rem;
+            display: flex;
+            gap: 10px;
+        }
+
+        .shopping-item::before {
+            content: '•';
+            color: #d32f2f;
+            font-weight: bold;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #999;
+            font-size: 1.1rem;
+            padding: 40px;
+        }
+
         @media (max-width: 768px) {
             .recipe-grid {
                 grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -375,15 +556,36 @@
             <h1>Recipe Customizer</h1>
         </header>
 
-        <div class="filters">
-            <button class="filter-btn active" data-category="all">All</button>
-            <button class="filter-btn" data-category="proteins">Proteins</button>
-            <button class="filter-btn" data-category="vegetables">Vegetables</button>
-            <button class="filter-btn" data-category="bases">Bases</button>
-            <button class="filter-btn" data-category="sauces">Sauces</button>
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('browse')">Browse Recipes</button>
+            <button class="nav-tab" onclick="switchTab('plan')">Meal Planning</button>
         </div>
 
-        <div class="recipe-grid" id="recipeGrid"></div>
+        <!-- Browse Recipes Section -->
+        <div id="browseSection" class="section active">
+            <div class="filters">
+                <button class="filter-btn active" data-category="all">All</button>
+                <button class="filter-btn" data-category="proteins">Proteins</button>
+                <button class="filter-btn" data-category="vegetables">Vegetables</button>
+                <button class="filter-btn" data-category="bases">Bases</button>
+                <button class="filter-btn" data-category="sauces">Sauces</button>
+            </div>
+
+            <div class="recipe-grid" id="recipeGrid"></div>
+        </div>
+
+        <!-- Meal Planning Section -->
+        <div id="planSection" class="section">
+            <div class="meal-plan-list" id="mealPlanList"></div>
+
+            <div class="shopping-list-container">
+                <div class="shopping-list-header">
+                    <h2 class="shopping-list-title">Shopping List</h2>
+                    <button class="copy-btn" onclick="copyShoppingList()">Copy to Clipboard</button>
+                </div>
+                <div id="shoppingListContent"></div>
+            </div>
+        </div>
     </div>
 
     <!-- Modal -->
@@ -790,11 +992,19 @@
 
         let currentRecipe = null;
         let currentServings = 4;
+        let mealPlan = {}; // Store servings for each recipe: { recipeId: servings }
+
+        // Pantry items to exclude from shopping list
+        const pantryItems = [
+            'salt', 'kosher salt', 'black pepper', 'pepper', 'olive oil',
+            'water', 'garlic powder', 'chili flakes'
+        ];
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             renderRecipes('all');
             setupFilters();
+            renderMealPlanList();
         });
 
         function setupFilters() {
@@ -951,6 +1161,211 @@
                 closeModal();
             }
         });
+
+        // Meal Planning Functions
+        function switchTab(tab) {
+            const tabs = document.querySelectorAll('.nav-tab');
+            const sections = document.querySelectorAll('.section');
+
+            tabs.forEach(t => t.classList.remove('active'));
+            sections.forEach(s => s.classList.remove('active'));
+
+            if (tab === 'browse') {
+                tabs[0].classList.add('active');
+                document.getElementById('browseSection').classList.add('active');
+            } else {
+                tabs[1].classList.add('active');
+                document.getElementById('planSection').classList.add('active');
+            }
+        }
+
+        function renderMealPlanList() {
+            const list = document.getElementById('mealPlanList');
+            list.innerHTML = recipes.map(recipe => `
+                <div class="meal-item">
+                    <div class="meal-info">
+                        <div class="meal-name">${recipe.name}</div>
+                        <div class="meal-category">${recipe.category}</div>
+                    </div>
+                    <div class="meal-selector">
+                        <label>Servings:</label>
+                        <input
+                            type="number"
+                            min="0"
+                            value="${mealPlan[recipe.id] || 0}"
+                            onchange="updateMealPlan(${recipe.id}, this.value)"
+                        />
+                    </div>
+                </div>
+            `).join('');
+
+            generateShoppingList();
+        }
+
+        function updateMealPlan(recipeId, servings) {
+            servings = parseInt(servings) || 0;
+            if (servings > 0) {
+                mealPlan[recipeId] = servings;
+            } else {
+                delete mealPlan[recipeId];
+            }
+            generateShoppingList();
+        }
+
+        function generateShoppingList() {
+            const aggregated = {};
+
+            // Aggregate ingredients from all selected recipes
+            Object.keys(mealPlan).forEach(recipeId => {
+                const recipe = recipes.find(r => r.id === parseInt(recipeId));
+                const servings = mealPlan[recipeId];
+                const scaleFactor = servings / recipe.baseServings;
+
+                recipe.ingredients.forEach(ing => {
+                    // Skip pantry items
+                    if (isPantryItem(ing.name)) {
+                        return;
+                    }
+
+                    const key = normalizeIngredientName(ing.name);
+                    const scaledAmount = ing.scalable ? (ing.amount * scaleFactor) : ing.amount;
+
+                    if (aggregated[key]) {
+                        aggregated[key].amount += scaledAmount;
+                    } else {
+                        aggregated[key] = {
+                            name: ing.name,
+                            amount: scaledAmount,
+                            unit: ing.unit,
+                            category: recipe.category
+                        };
+                    }
+                });
+            });
+
+            displayShoppingList(aggregated);
+        }
+
+        function normalizeIngredientName(name) {
+            // Combine similar ingredients
+            const normalized = name.toLowerCase().trim();
+
+            // Group chicken
+            if (normalized.includes('chicken thigh')) {
+                return 'chicken_thighs';
+            }
+            if (normalized.includes('chicken')) {
+                return 'chicken';
+            }
+
+            // Group beef
+            if (normalized.includes('flank') || normalized.includes('sirloin') || normalized.includes('steak')) {
+                return 'beef';
+            }
+
+            // Group similar vegetables
+            if (normalized.includes('broccoli')) return 'broccoli';
+            if (normalized.includes('sweet potato')) return 'sweet_potatoes';
+            if (normalized.includes('carrot')) return 'carrots';
+            if (normalized.includes('kale')) return 'kale';
+
+            // Group similar bases
+            if (normalized.includes('brown rice')) return 'brown_rice';
+            if (normalized.includes('farro')) return 'farro';
+
+            // Default: use the original name
+            return normalized.replace(/[^a-z0-9]/g, '_');
+        }
+
+        function isPantryItem(name) {
+            const normalized = name.toLowerCase();
+            return pantryItems.some(item => normalized.includes(item));
+        }
+
+        function displayShoppingList(aggregated) {
+            const content = document.getElementById('shoppingListContent');
+            const items = Object.values(aggregated);
+
+            if (items.length === 0) {
+                content.innerHTML = '<div class="empty-message">Select recipes above to generate your shopping list</div>';
+                return;
+            }
+
+            // Group by category
+            const byCategory = {
+                proteins: [],
+                vegetables: [],
+                bases: [],
+                sauces: [],
+                other: []
+            };
+
+            items.forEach(item => {
+                const cat = item.category || 'other';
+                if (byCategory[cat]) {
+                    byCategory[cat].push(item);
+                } else {
+                    byCategory.other.push(item);
+                }
+            });
+
+            let html = '<div class="shopping-list">';
+
+            Object.keys(byCategory).forEach(category => {
+                if (byCategory[category].length > 0) {
+                    html += `
+                        <div class="shopping-category">
+                            <h3 class="shopping-category-title">${category.charAt(0).toUpperCase() + category.slice(1)}</h3>
+                    `;
+
+                    byCategory[category].forEach(item => {
+                        const formattedAmount = formatAmount(item.amount);
+                        html += `
+                            <div class="shopping-item">
+                                ${formattedAmount} ${item.unit} ${item.name}
+                            </div>
+                        `;
+                    });
+
+                    html += '</div>';
+                }
+            });
+
+            html += '</div>';
+            content.innerHTML = html;
+        }
+
+        function copyShoppingList() {
+            const content = document.getElementById('shoppingListContent');
+            const btn = document.querySelector('.copy-btn');
+
+            // Extract text from the shopping list
+            const categories = content.querySelectorAll('.shopping-category');
+            let text = 'SHOPPING LIST\n\n';
+
+            categories.forEach(cat => {
+                const title = cat.querySelector('.shopping-category-title').textContent;
+                const items = cat.querySelectorAll('.shopping-item');
+
+                text += `${title.toUpperCase()}\n`;
+                items.forEach(item => {
+                    text += `• ${item.textContent.trim()}\n`;
+                });
+                text += '\n';
+            });
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'Copy to Clipboard';
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                alert('Failed to copy. Please try selecting and copying manually.');
+            });
+        }
     </script>
 </body>
 </html>
