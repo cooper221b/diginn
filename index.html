@@ -1039,10 +1039,12 @@
                 ? recipes
                 : recipes.filter(r => r.category === category);
 
-            grid.innerHTML = filteredRecipes.map(recipe => `
+            grid.innerHTML = filteredRecipes.map(recipe => {
+                const encodedName = encodeURIComponent(recipe.name);
+                return `
                 <div class="recipe-card" onclick="openRecipe(${recipe.id})">
                     <div class="recipe-image">
-                        <img src="https://source.unsplash.com/400x300/?${recipe.imageKeywords},food"
+                        <img src="https://via.placeholder.com/400x300/d32f2f/ffffff?text=${encodedName}"
                              alt="${recipe.name}"
                              loading="lazy"
                              style="width: 100%; height: 100%; object-fit: cover;">
@@ -1056,7 +1058,8 @@
                         </div>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
 
         function openRecipe(recipeId) {
